@@ -17,7 +17,7 @@ app.use(cors({ origin: '*' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.get('/', (request, response) =>{
+app.get('/', (request, response) => {
     response.send('hello world')
 })
 
@@ -60,10 +60,7 @@ app.put('/dados', (request, response) => {
         .then(result => {
             if (!!result.rowCount == true)
                 pool.query(sql2)
-                    .then(result => {
-                        if (err) { response.send(false); throw err; };
-                        response.send(true)
-                    })
+                    .then(result => { console.log("Deu Certo"); response.send(true) })
                     .catch(e => { console.log(sql2); console.log(e); response.send(false) })
         })
         .catch(e => { console.log(sql1); console.log(e); response.send(false) })
@@ -73,10 +70,8 @@ app.delete('/dados', (request, response) => {
     console.log(JSON.stringify(request.query))
     const sql = `delete from pessoa where idpessoa = ${request.query.idpessoa}`
     pool.query(sql)
-        .then(res => { response.send(true) })
+        .then(res => { console.log("Deu Certo"); response.send(true) })
         .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`))
-
-
