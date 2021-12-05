@@ -25,7 +25,7 @@ app.get('/dados', (request, response, next) => {
     const id = request.query
     console.log(request.params)
     if (JSON.stringify(id) == "{}")
-        pool.query("SELECT * FROM pessoa")
+        pool.query("SELECT * FROM pessoa order by idpessoa asc")
             .then(result => response.send(result.rows))
             .catch(err => { console.log(err); throw err })
     else {
