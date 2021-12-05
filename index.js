@@ -17,6 +17,10 @@ app.use(cors({ origin: '*' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.get('/', (request, response) =>{
+    response.send('hello world')
+})
+
 app.get('/dados', (request, response, next) => {
     const id = request.query
     console.log(request.params)
