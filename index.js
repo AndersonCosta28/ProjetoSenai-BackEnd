@@ -1,39 +1,33 @@
-const con = require('./db');
 const express = require('express')
-const bodyparser = require('body-parser');
-const { request } = require('express');
 const app = express()
-var cors = require('cors');
+const cors = require('cors');
+const { Pool, Client, Query } = require('pg')
+const pool = new Pool({
+    user: 'sbqzwjcs',
+    host: 'kesavan.db.elephantsql.com',
+    database: 'sbqzwjcs',
+    password: 'fVjOb8DncYLD2JkUWpmtf3SY9K0vSG19'
+})
+pool
+    .connect()
+    .then(() => console.log('connected'))
+    .catch(err => console.error('connection error', err.stack))
 
-
-app.use(bodyparser.urlencoded({ extended: true }))
 app.use(cors({ origin: '*' }));
-app.use(bodyparser.json())
-
-con.connect(function (err) {
-    if (err) throw err;
-    console.log("Connected!");
-});
-
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.get('/dados', (request, response, next) => {
     const id = request.query
     console.log(request.params)
-    response.header("Access-Control-Allow-Origin", "*");
-    response.setHeader('Access-Control-Allow-Origin', '*');
-    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    response.setHeader('Access-Control-Allow-Credentials', true);
     if (JSON.stringify(id) == "{}")
-        con.query("SELECT * FROM pessoa", function (err, result, fields) {
-            if (err) throw err;
-            response.send(result);
-        });
+        pool.query("SELECT * FROM pessoa")
+            .then(result => response.send(result.rows))
+            .catch(err => { console.log(err); throw err })
     else {
-        con.query(`SELECT * FROM pessoa left join endereco on endereco.pessoa_id = pessoa.idpessoa where idpessoa = ${request.query.idpessoa}`, function (err, result, fields) {
-            if (err) throw err;
-            response.send(result);
-        });
+        pool.query(`SELECT * FROM pessoa left join endereco on endereco.pessoa_id = pessoa.idpessoa where idpessoa = ${request.query.idpessoa}`)
+            .then(result => response.send(result.rows))
+            .catch(err => { console.log(err); throw err })
     }
 })
 
@@ -41,45 +35,42 @@ app.post('/dados', (request, response) => {
     console.log(request.body)
     const req = request.body;
     const { endereco } = req
-    const cep = req.cep
-    var sql = `insert into pessoa (nome,sobrenome,telefone,email) values ("${req.nome}", "${req.sobrenome}", "${req.telefone}", "${req.email}")`;
-
-    con.query(sql, function (err, result) {
-        if (err) { response.send(false); throw err; }
-        const sql2 = `INSERT INTO endereco (cep, logradouro, numero, bairro, localidade, complemento,uf, pessoa_id) VALUES ("${String(endereco.cep).replace('-', '')}", "${endereco.logradouro}", "${String(endereco.numero).replace(undefined, '')}", "${endereco.bairro}", "${endereco.localidade}", "${endereco.complemento}", "${endereco.uf}", ${result.insertId});`
-        if (!!result.affectedRows == true)
-            con.query(sql2, function (err, result) {
-                if (err) { response.send(false); throw err; };
-                response.send(true)
-            })
-        else {
-            response.send(false)
-        }
-    });
+    const sql = `insert into pessoa (nome,sobrenome,telefone,email) values ('${req.nome}', '${req.sobrenome}', '${req.telefone}', '${req.email}') RETURNING idpessoa;`;
+    pool.query(sql)
+        .then(res => {
+            const [{ idpessoa }] = res.rows
+            console.log(idpessoa)
+            const sql2 = `INSERT INTO endereco (cep, logradouro, numero, bairro, localidade, complemento,uf, pessoa_id) VALUES ('${String(endereco.cep).replace('-', '')}', '${endereco.logradouro}', '${String(endereco.numero).replace(undefined, '')}', '${endereco.bairro}', '${endereco.localidade}', '${endereco.complemento}', '${endereco.uf}', ${idpessoa});`
+            pool.query(sql2)
+                .then(res => { console.log("Deu Certo"); response.send(true) })
+                .catch(e => { console.log(e); response.send(false) })
+        })
+        .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 
 app.put('/dados', (request, response) => {
     const { endereco } = request.body
-    const sql1 = `UPDATE PESSOA SET NOME = "${request.body.nome}", SOBRENOME = "${request.body.sobrenome}", TELEFONE = "${request.body.telefone}", EMAIL= "${request.body.email}" WHERE idpessoa = ${request.body.idpessoa}`
-    const sql2 = `UPDATE ENDERECO SET cep = "${String(endereco.cep).replace('-', '')}", logradouro = "${endereco.logradouro}", numero = "${String(endereco.numero).replace(undefined, '')}", bairro = "${endereco.bairro}", localidade =  "${endereco.localidade}", complemento = "${endereco.complemento}",uf = "${endereco.uf}" where idendereco = ${endereco.idendereco}`   
-    con.query(sql1, function (err, result) {
-        if (err) { response.send(false); throw err; }
-        if (!!result.affectedRows == true)
-            con.query(sql2, function (err, result) {
-                if (err) { response.send(false); throw err; };
-                response.send(true)
-            })
-        else {
-            response.send(false)
-        }
-    });
+    const sql1 = `UPDATE PESSOA SET NOME = '${request.body.nome}', SOBRENOME = '${request.body.sobrenome}', TELEFONE = '${request.body.telefone}', EMAIL= '${request.body.email}' WHERE idpessoa = ${request.body.idpessoa}`
+    const sql2 = `UPDATE ENDERECO SET cep = '${String(endereco.cep).replace('-', '')}', logradouro = '${endereco.logradouro}', numero = '${String(endereco.numero).replace(undefined, '')}', bairro = '${endereco.bairro}', localidade =  '${endereco.localidade}', complemento = '${endereco.complemento}',uf = '${endereco.uf}' where idendereco = ${endereco.idendereco}`
+    pool.query(sql1)
+        .then(result => {
+            if (!!result.rowCount == true)
+                pool.query(sql2)
+                    .then(result => {
+                        if (err) { response.send(false); throw err; };
+                        response.send(true)
+                    })
+                    .catch(e => { console.log(sql2); console.log(e); response.send(false) })
+        })
+        .catch(e => { console.log(sql1); console.log(e); response.send(false) })
 })
-app.delete('/dados', (request, response) =>{    
+
+app.delete('/dados', (request, response) => {
     console.log(JSON.stringify(request.query))
-    con.query(`delete from pessoa where idpessoa = ${request.query.idpessoa}`,function (err, result) {
-        if (err) { response.send(false); throw err; }
-        else{response.send(true)}
-    })
+    const sql = `delete from pessoa where idpessoa = ${request.query.idpessoa}`
+    pool.query(sql)
+        .then(res => { response.send(true) })
+        .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 
 app.listen(3000, function () {
