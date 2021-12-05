@@ -27,7 +27,6 @@ app.get('/dados', (request, response, next) => {
     if (JSON.stringify(id) == "{}")
         con.query("SELECT * FROM pessoa", function (err, result, fields) {
             if (err) throw err;
-            console.log(result)
             response.send(result);
         });
     else {
@@ -61,7 +60,6 @@ app.post('/dados', (request, response) => {
 
 app.put('/dados', (request, response) => {
     const { endereco } = request.body
-    const req = JSON.stringify(request.body);
     const sql1 = `UPDATE PESSOA SET NOME = "${request.body.nome}", SOBRENOME = "${request.body.sobrenome}", TELEFONE = "${request.body.telefone}", EMAIL= "${request.body.email}" WHERE idpessoa = ${request.body.idpessoa}`
     const sql2 = `UPDATE ENDERECO SET cep = "${String(endereco.cep).replace('-', '')}", logradouro = "${endereco.logradouro}", numero = "${String(endereco.numero).replace(undefined, '')}", bairro = "${endereco.bairro}", localidade =  "${endereco.localidade}", complemento = "${endereco.complemento}",uf = "${endereco.uf}" where idendereco = ${endereco.idendereco}`   
     con.query(sql1, function (err, result) {
@@ -75,6 +73,13 @@ app.put('/dados', (request, response) => {
             response.send(false)
         }
     });
+})
+app.delete('/dados', (request, response) =>{    
+    console.log(JSON.stringify(request.query))
+    con.query(`delete from pessoa where idpessoa = ${request.query.idpessoa}`,function (err, result) {
+        if (err) { response.send(false); throw err; }
+        else{response.send(true)}
+    })
 })
 
 app.listen(3000, function () {
