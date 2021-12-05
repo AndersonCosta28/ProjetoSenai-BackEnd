@@ -29,7 +29,7 @@ app.get('/dados', (request, response, next) => {
             .then(result => response.send(result.rows))
             .catch(err => { console.log(err); throw err })
     else {
-        pool.query(`SELECT * FROM pessoa left join endereco on endereco.pessoa_id = pessoa.idpessoa where idpessoa = ${request.query.idpessoa}`)
+        pool.query(`SELECT * FROM pessoa left join endereco on endereco.pessoa_id = pessoa.idpessoa where idpessoa = ${request.query.idpessoa} order by idpessoa asc`)
             .then(result => response.send(result.rows))
             .catch(err => { console.log(err); throw err })
     }
