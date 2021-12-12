@@ -89,5 +89,14 @@ app.delete('/dados', (request, response) => {
         .then(res => { console.log("Deu Certo"); response.send(true) })
         .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
+
+app.post('/evento',(request,response)=> {
+    const req = request.body;
+    const sql = `insert into evento (banda,dia,horario,ingresso_inteira,ingresso_meia) values (Upper('${req.banda}'), '${req.Dia}', '${req.Horario}', ${req.valor_inteira}, ${req.valor_meia})`;
+    pool.query(sql)
+    .then(res => { console.log("Deu Certo"); response.send(true) })
+    .catch(e => { console.log(e); response.send(false) })
+})
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`))
