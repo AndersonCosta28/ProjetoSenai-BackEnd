@@ -122,5 +122,13 @@ app.put('/evento', (request, response) => {
         .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 
+app.delete('/evento', (request, response) => {
+    console.log(JSON.stringify(request.query))
+    const sql = `delete from evento where idevento = ${request.query.idevento}`
+    pool.query(sql)
+        .then(res => { console.log("Deu Certo"); response.send(true) })
+        .catch(e => { console.log(sql); console.log(e); response.send(false) })
+})
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`))
