@@ -116,10 +116,10 @@ app.get('/evento', (request, response,) => {
 })
 
 app.put('/evento', (request, response) => {
-    const sql1 = `UPDATE EVENTO SET BANDA = '${request.body.banda}', datahora = '${request.body.datahora}', ingresso_inteira = '${request.body.valor_inteira}', ingresso_meia= '${request.body.valor_meia}' WHERE idevento = ${request.body.idevento}`
-    pool.query(sql1)
+    const sql = `UPDATE EVENTO SET BANDA = '${request.body.banda}', datahora = '${request.body.datahora}', ingresso_inteira = '${request.body.valor_inteira}', ingresso_meia= '${request.body.valor_meia}' WHERE idevento = ${request.body.idevento}`
+    pool.query(sql)
         .then(result => { console.log("Deu Certo"); response.send(true) })
-        .catch(e => { console.log(sql2); console.log(e); response.send(false) })
+        .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 
 const PORT = process.env.PORT || 8080;
