@@ -95,7 +95,7 @@ app.post('/evento',(request,response)=> {
     console.log(req)
     const sql = `insert into evento (banda,dia,horario,ingresso_inteira,ingresso_meia) values (Upper('${req.banda}'), '${req.Dia}', '${req.Horario}', ${req.valor_inteira}, ${req.valor_meia})`;
     pool.query(sql)
-    .then(res => { console.log("Deu Certo"); response.send(true) })
+    .then(res => { console.log(sql);console.log("Deu Certo"); response.send(true) })
     .catch(e => { console.log(e); response.send(false) })
 })
 
