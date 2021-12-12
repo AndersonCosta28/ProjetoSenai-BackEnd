@@ -105,7 +105,7 @@ app.get('/evento', (request, response, ) => {
     console.log(request.params)
     if (JSON.stringify(id) == "{}") {
         pool.query("SELECT * FROM evento order by idevento asc")
-            .then(result => response.send(result.rows))
+            .then(result => {console.log(result.rows); response.send(result.rows)})
             .catch(err => { console.log(err); throw err })
     }
     else {
