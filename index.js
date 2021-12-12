@@ -93,7 +93,7 @@ app.delete('/dados', (request, response) => {
 app.post('/evento',(request,response)=> {
     const req = request.body;
     console.log(req)
-    const sql = `insert into evento (banda,dia,horario,ingresso_inteira,ingresso_meia) values (Upper('${req.banda}'), '${req.Dia}', '${req.Horario}', ${req.valor_inteira}, ${req.valor_meia})`;
+    const sql = `insert into evento (banda,dia,horario,ingresso_inteira,ingresso_meia) values (Upper('${req.banda}'), '${req.Dia}', '${req.Horario}', ${String(req.valor_inteira).replaceAll(',','.')}, ${String(req.valor_meia).replaceAll(',','.')})`;
     pool.query(sql)
     .then(res => { console.log("Deu Certo"); response.send(true) })
     .catch(e => { console.log(sql);console.log(e); response.send(false) })
