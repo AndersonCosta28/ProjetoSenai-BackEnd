@@ -23,7 +23,7 @@ app.get('/', (request, response) => {
 
 app.get('/GetNome', (request, response) => {
     console.log(request.query.nome)
-    
+
     pool.query(`SELECT * FROM pessoa left join endereco on endereco.pessoa_id = pessoa.idpessoa where nome like '%${String(request.query.nome).toUpperCase()}%' order by idpessoa asc`)
         .then(result => response.send(result.rows))
         .catch(err => { console.log(err); throw err })
@@ -90,22 +90,22 @@ app.delete('/dados', (request, response) => {
         .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 
-app.post('/evento',(request,response)=> { //replace('${req.Dia}', '/', '-')
+app.post('/evento', (request, response) => { //replace('${req.Dia}', '/', '-')
     const req = request.body;
     console.log(req)
-    const sql = `insert into evento (banda,datahora,ingresso_inteira,ingresso_meia) values (Upper('${req.banda}'), '${req.datahora}' , ${String(req.valor_inteira).replace(',','.')}, ${String(req.valor_meia).replace(',','.')})`;
+    const sql = `insert into evento (banda,datahora,ingresso_inteira,ingresso_meia) values (Upper('${req.banda}'), '${req.datahora}' , ${String(req.valor_inteira).replace(',', '.')}, ${String(req.valor_meia).replace(',', '.')})`;
     pool.query(sql)
-    .then(res => { console.log("Deu Certo"); response.send(true) })
-    .catch(e => { console.log(sql);console.log(e); response.send(false) })
+        .then(res => { console.log("Deu Certo"); response.send(true) })
+        .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 
-app.get('/evento', (request, response, ) => {
+app.get('/evento', (request, response,) => {
     const id = request.query
 
     console.log(request.params)
     if (JSON.stringify(id) == "{}") {
         pool.query("SELECT * FROM evento order by idevento asc")
-            .then(result => {console.log(result.rows); response.send(result.rows)})
+            .then(result => { console.log(result.rows); response.send(result.rows) })
             .catch(err => { console.log(err); throw err })
     }
     else {
@@ -113,6 +113,13 @@ app.get('/evento', (request, response, ) => {
             .then(result => response.send(result.rows))
             .catch(err => { console.log(err); throw err })
     }
+})
+
+app.put('/evento', (request, response) => {
+    const sql1 = `UPDATE EVENTO SET BANDA = '${request.body.banda}', datahora = '${request.body.datahora}', ingresso_inteira = '${request.body.valor_inteira}', ingresso_meia= '${request.body.valor_meia}' WHERE idevento = ${request.body.idevento}`
+    pool.query(sql1)
+        .then(result => { console.log("Deu Certo"); response.send(true) })
+        .catch(e => { console.log(sql2); console.log(e); response.send(false) })
 })
 
 const PORT = process.env.PORT || 8080;
