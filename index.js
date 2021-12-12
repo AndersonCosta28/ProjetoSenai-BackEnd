@@ -99,5 +99,21 @@ app.post('/evento',(request,response)=> { //replace('${req.Dia}', '/', '-')
     .catch(e => { console.log(sql);console.log(e); response.send(false) })
 })
 
+app.get('/evento', (request, response, ) => {
+    const id = request.query
+
+    console.log(request.params)
+    if (JSON.stringify(id) == "{}") {
+        pool.query("SELECT * FROM evento order by p.idevento asc")
+            .then(result => response.send(result.rows))
+            .catch(err => { console.log(err); throw err })
+    }
+    else {
+        pool.query(`SELECT * FROM evento where idevento = ${request.query.idevento} order by idevento asc`)
+            .then(result => response.send(result.rows))
+            .catch(err => { console.log(err); throw err })
+    }
+})
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`))
