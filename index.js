@@ -21,13 +21,23 @@ app.get('/', (request, response) => {
     response.send('hello world')
 })
 
+app.get('/GetNome', (request, response) => {
+    response.send(request.query)
+    pool.query(`SELECT * FROM pessoa left join endereco on endereco.pessoa_id = pessoa.idpessoa where idpessoa = ${request.query.idpessoa} order by idpessoa asc`)
+        .then(result => response.send(result.rows))
+        .catch(err => { console.log(err); throw err })
+})
+
 app.get('/dados', (request, response, next) => {
     const id = request.query
+
     console.log(request.params)
-    if (JSON.stringify(id) == "{}")
+    if (JSON.stringify(id) == "{}") {
         pool.query("SELECT * FROM pessoa as p join endereco as e on e.pessoa_id = p.idpessoa order by p.idpessoa asc")
             .then(result => response.send(result.rows))
             .catch(err => { console.log(err); throw err })
+    }
+    //else if(request.query.nome){}
     else {
         pool.query(`SELECT * FROM pessoa left join endereco on endereco.pessoa_id = pessoa.idpessoa where idpessoa = ${request.query.idpessoa} order by idpessoa asc`)
             .then(result => response.send(result.rows))
@@ -35,11 +45,16 @@ app.get('/dados', (request, response, next) => {
     }
 })
 
+app.get('/dados/:nome', (request, response) => {
+    console.log(request.query.nome)
+    response.end()
+})
+
 app.post('/dados', (request, response) => {
     console.log(request.body)
     const req = request.body;
     const { endereco } = req
-    const sql = `insert into pessoa (nome,sobrenome,telefone,email) values ('${req.nome}', '${req.sobrenome}', '${req.telefone}', '${req.email}') RETURNING idpessoa;`;
+    const sql = `insert into pessoa (nome,sobrenome,telefone,email) values ('upper(${req.nome})', 'upper(${req.sobrenome})', '${req.telefone}', '${req.email}') RETURNING idpessoa;`;
     pool.query(sql)
         .then(res => {
             const [{ idpessoa }] = res.rows

@@ -17,7 +17,7 @@ app.get('/dados', (request, response, next) => {
     const id = request.query
     console.log(request.params)
         if (JSON.stringify(id) == "{}")
-        con.query("SELECT * FROM pessoa", function (err, result, fields) {
+        con.query("SELECT * FROM pessoa as p join endereco as e on e.pessoa_id = p.idpessoa order by p.idpessoa asc", function (err, result, fields) {
             if (err) throw err;
             response.send(result);
         });
