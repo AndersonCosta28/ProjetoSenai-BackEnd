@@ -54,7 +54,7 @@ app.post('/dados', (request, response) => {
     console.log(request.body)
     const req = request.body;
     const { endereco } = req
-    const sql = `insert into pessoa (nome,sobrenome,telefone,email) values ('upper(${req.nome})', 'upper(${req.sobrenome})', '${req.telefone}', '${req.email}') RETURNING idpessoa;`;
+    const sql = `insert into pessoa (nome,sobrenome,telefone,email) values (upper('${req.nome}'), upper('${req.sobrenome}'), '${req.telefone}', '${req.email}') RETURNING idpessoa;`;
     pool.query(sql)
         .then(res => {
             const [{ idpessoa }] = res.rows
