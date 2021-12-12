@@ -109,9 +109,10 @@ app.get('/evento', (request, response,) => {
             .catch(err => { console.log(err); throw err })
     }
     else {
-        pool.query(`SELECT * FROM evento where idevento = ${request.query.idevento} order by idevento asc`)
+        const sql = `SELECT * FROM evento where idevento = ${request.query.idevento} order by idevento asc`;
+        pool.query(sql)
             .then(result => response.send(result.rows))
-            .catch(err => { console.log(err); throw err })
+            .catch(err => { console.log(sql);console.log(err); throw err })
     }
 })
 
