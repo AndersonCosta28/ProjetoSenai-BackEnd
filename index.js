@@ -92,6 +92,7 @@ app.delete('/dados', (request, response) => {
 
 app.post('/evento',(request,response)=> {
     const req = request.body;
+    console.log(req)
     const sql = `insert into evento (banda,dia,horario,ingresso_inteira,ingresso_meia) values (Upper('${req.banda}'), '${req.Dia}', '${req.Horario}', ${req.valor_inteira}, ${req.valor_meia})`;
     pool.query(sql)
     .then(res => { console.log("Deu Certo"); response.send(true) })
