@@ -142,8 +142,10 @@ app.post('/venda', (request, response) =>{
 })
 
 app.get('/venda', (request, response) =>{
-    response.send('Hello World');
-
+  const sql = `SELECT * FROM venda JOIN pessoa ON pessoa_id = idpessoa JOIN evento ON evento_id = idevento;`;
+    pool.query(sql)
+    .then(res => {console.log("vamo carai"); response.send(true) })
+    .catch(e => {console.log(sql); console.log(e); response.send(false) })
 })
 
 const PORT = process.env.PORT || 8080;
