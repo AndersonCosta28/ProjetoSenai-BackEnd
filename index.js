@@ -141,5 +141,10 @@ app.post('/venda', (request, response) =>{
 
 })
 
+app.get('/venda', (request, response) =>{
+    response.send('Hello World');
+
+})
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`))
