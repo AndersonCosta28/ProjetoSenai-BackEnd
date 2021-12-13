@@ -131,5 +131,15 @@ app.delete('/evento', (request, response) => {
         .catch(e => { console.log(sql); console.log(e); response.send(false) })
 })
 
+app.post('/venda', (request, response) =>{
+    const req = request.body;
+    console.log(req)
+    const sql = `INSERT INTO venda(pessoa_id, evento_id, valor_ingresso, tipo_ingresso) VALUES (${req.pessoa_id}, ${req.evento_id}, ${req.valor},'${req.sigla}');`;
+    pool.query(sql)
+        .then(res => { console.log("Deu Certo"); response.send(true) })
+        .catch(e => { console.log(sql); console.log(e); response.send(false) })
+
+})
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`))
